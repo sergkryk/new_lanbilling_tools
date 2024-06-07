@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+html(lang="en")
+  head
+    meta(charset="UTF-8")
+    meta(http-equiv="X-UA-Compatible" content="IE=edge")
+    meta(name="viewport" content="width=device-width, initial-scale=1.0")
+    link(href="/css/normalize.css" rel="stylesheet")
+    link(href="/css/styles.min.css" rel="stylesheet")
+    title #{title}
+  body
+    .site-container
+      header
+        p ISP Asknet
+      main
+        .container
+          h1.title Авторизация администратора
+          form.base-form(method="POST")
+            .base-form__container
+              label(for="login") Логин
+              input(type="text" id="login" name="login" placeholder="Имя пользователя")
+            .base-form__container
+              label(for="pass") Пароль
+              input(type="password" id="pass" name="pass" placeholder="Пароль пользователя")
+            button(type="submit") Войти
+      footer
+        a(href="tel+79591251090") +7(959)125-10-90
+    script(src="/js/login.js")

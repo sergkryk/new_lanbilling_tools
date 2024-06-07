@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+html(lang="en")
+  head
+    meta(charset="UTF-8")
+    meta(http-equiv="X-UA-Compatible" content="IE=edge")
+    meta(name="viewport" content="width=device-width, initial-scale=1.0")
+    link(href="/css/normalize.css" rel="stylesheet")
+    link(href="/css/styles.min.css" rel="stylesheet")
+    title #{title}
+  body
+    .site-container
+      header
+        p ISP Asknet
+      main
+        .container
+          p.info Для пополнения счёта необходимо ввести лицевой счёт пользователя. Четыре цифры логина, который использует абонент для подключения к интернету.
+          form.base-form(action="")
+            .base-form__container
+              label(for="account") Введите лицевой счёт
+              input(type="number" id="account" name="account" placeholder="лицевой счёт пользователя" tabindex="1")
+            button(type="submit") Проверить
+            if notFound
+              p Не найден
+      footer
+        a(href="tel+79591251090") +7(959)125-10-90

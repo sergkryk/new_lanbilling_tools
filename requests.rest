@@ -1,0 +1,18 @@
+GET http://127.0.0.1:3000/postoffice?QueryType=check&TransactionId=20240502050212-2685&TransactionDate=20240513223000&Account=1110&Amount=10.00
+###
+GET http://127.0.0.1:3000/postoffice?QueryType=pay&TransactionId=20240502050212-2685&TransactionDate=20240512223000&Account=1110&Amount=10.00
+###
+GET http://127.0.0.1:3000/postoffice?QueryType=cancel&TransactionId=20240502050212-2685&TransactionDate=20240512223000&Account=1110&Amount=10.00
+###
+GET http://127.0.0.1:3000/paydayreport?CheckDateBegin=20240528000000&CheckDateEnd=20240529000000
+
+###
+https://chernuhino.online:8443/postoffice?QueryType=check&TransactionId=185&TransactionDate=20230219130000&Account=1110&Amount=10.00
+###
+https://chernuhino.online:8443/postoffice?QueryType=pay&TransactionId=185&TransactionDate=20240507130000&Account=1110&Amount=10.00
+###
+https://chernuhino.online:8443/postoffice?QueryType=cancel&TransactionId=185&TransactionDate=20240507130000&Account=1110&Amount=10.00
+
+###
+https://chernuhino.online:8443/paydayreport?CheckDateBegin=20240501000000&CheckDateEnd=20240502000000
+

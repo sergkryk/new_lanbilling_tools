@@ -41,6 +41,9 @@ build/Release
 # Dependency directories
 node_modules/
 jspm_packages/
+api3.wsdl
+encoding.xml
+requests.rest
 
 # Snowpack dependency directory (https://snowpack.dev/)
 web_modules/

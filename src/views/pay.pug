@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+html(lang="en")
+  head
+    meta(charset="UTF-8")
+    meta(http-equiv="X-UA-Compatible" content="IE=edge")
+    meta(name="viewport" content="width=device-width, initial-scale=1.0")
+    link(href="/css/normalize.css" rel="stylesheet")
+    link(href="/css/styles.min.css" rel="stylesheet")
+    title #{title}
+  body
+    .site-container
+      header
+        p ISP Asknet
+      main
+        .container
+          .address
+            .address__wrapper 
+              span.address__key Лицевой счёт:
+              span.address__value #{uid}
+            .address__wrapper 
+              span.address__key Баланс:
+              span.address__value #{balance}
+            .address__wrapper 
+              span.address__key Тариф:
+              span.address__value #{tariff}
+            .address__wrapper 
+              span.address__key ФИО: 
+              span.address__value(id="fio") #{fio}
+            .address__wrapper 
+              span.address__key Адрес:
+              span.address__value(id="address") #{street}
+          form.base-form(action="", method="POST")
+            .base-form__container.base-form__container--pay
+              label(for="sum"/label)
+              input(type="number" id="sum" name="sum" placeholder="Введите сумму оплаты" required="true")
+            input(type="text" id="agrmid" name="agrmid" value=agrmid hidden="true")
+            input(type="text" id="phone" name="phone" value=phone hidden="true")
+            button(type="submit") Оплатить
+      footer
+        a(href="tel+79591251090") +7(959)125-10-90
+    script(src="/js/pay.js") 
