@@ -1,4 +1,4 @@
-import express, { Express, Request, Response, Router } from "express";
+import express from "express";
 import bodyParser from "body-parser";
 import path from "path";
 import dotenv from "dotenv";
@@ -12,7 +12,7 @@ import psbRouter from "./routes/psb";
 import paydayRouter from "./routes/payday";
 import clientRouter from "./routes/client";
 // переменные для порта и адреса для expressjs
-const PORT = 3000;
+const PORT = 3002;
 const INTERFACE = "127.0.0.1";
 // создаю веб-сервер >>>>>>>>>>>>>>
 const app = express();
