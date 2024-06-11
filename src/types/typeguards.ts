@@ -21,6 +21,7 @@ import {
   NodeSoapAccountFullResponse,
   ServiceProfile,
   NodeSoapGetServiceResponse,
+  NodeSoapLoginResponseHeaders,
 } from "./types";
 
 export const isPayFormBody = function (
@@ -607,4 +608,14 @@ export const isNodeSoapGetServiceResponse = function(obj: any): obj is NodeSoapG
     Array.isArray(obj[0].ret) &&
     obj[0].ret.every(isServiceProfile)
   );
+}
+
+export const isNodeSoapLoginResponseHeaders = function(obj: any): obj is NodeSoapLoginResponseHeaders {
+  return typeof obj === 'object' &&
+      typeof obj.server === 'string' &&
+      typeof obj['content-type'] === 'string' &&
+      typeof obj['content-length'] === 'string' &&
+      typeof obj.connection === 'string' &&
+      Array.isArray(obj['set-cookie']) &&
+      obj['set-cookie'].every((item: any) => typeof item === 'string');
 }

@@ -16,7 +16,7 @@ import { providers } from "../config/providers";
 import { httpQueryLogger } from "../utils/log";
 import { citypayErrorHandler } from "../utils/errorHandler";
 import CitypaySmsInformer from "./citipaySmsInformer";
-import NodeSoap from "../models/soap";
+import NodeSoap from "../models/soap_v2";
 
 export const citypay = async function (req: Request, res: Response, next: NextFunction) {
   /* объявляю переменную модперсон, нужна чтобы передать в платежку оператора платежа, делаю через url 
@@ -34,8 +34,10 @@ export const citypay = async function (req: Request, res: Response, next: NextFu
     const type = req.query.QueryType;
     // записываю в журнал запросов
     httpQueryLogger(req);
-    // авторизуюсь в биллинге
+    // создаю инстанс модели для работы с биллингом
     const soapClient = await NodeSoap.init();
+    // авторизуюсь в биллинге
+    await soapClient.managerLogin()
     // запрашиваю у биллинга информацию об учетной записи
     const vgroupRequest: NodeSoapVgroupResponse = await soapClient.getVgroups({
       flt: { login: Account },
@@ -133,6 +135,7 @@ export const citypay = async function (req: Request, res: Response, next: NextFu
       default:
         break;
     }
+    await soapClient.logoutAsync();
   } catch (error: any) {
     citypayErrorHandler(req, res, error);
   }

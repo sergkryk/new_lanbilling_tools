@@ -6,7 +6,7 @@ import {
   isNodeSoapVgroupResponse,
   isPayFormBody,
 } from "../types/typeguards";
-import NodeSoap from "../models/soap";
+import NodeSoap from "../models/soap_v2";
 
 // Function to modify request object for Citypay query
 const getCitypayQueryObj = (req: Request, sum: string): Request => {
@@ -31,6 +31,7 @@ export const checkController = async function (
       throw new Error();
     }
     const soapClient = await NodeSoap.init();
+    await soapClient.managerLogin()
     const vgroupRequest = await soapClient.getVgroups({
       flt: { login: account },
     });
@@ -63,6 +64,8 @@ export const payController = async function (req: Request, res: Response) {
     }
     // Initialize database model
     const soapClient = await NodeSoap.init();
+    // Authentificate database model
+    await soapClient.managerLogin();
     // Extract required fields from request body
     const { agrmid, sum, admin } = req.body;
     // Modify request object to add necessary fields for SMS notification
@@ -86,6 +89,8 @@ export const payController = async function (req: Request, res: Response) {
     httpQueryLogger(req);
     // // Send SMS notification to the user
     await informer.informViaSms("pay");
+    // Logout db model
+    await soapClient.logoutAsync();
     // // Render success page with payment details
     res.render("success", {
       sum,

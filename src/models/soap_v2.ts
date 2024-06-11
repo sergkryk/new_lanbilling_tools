@@ -1,58 +1,60 @@
 import { Client, createClientAsync, IOptions } from "soap";
 import path from "path";
-import { GetPaymentsProfile, PaymentArguments } from "../types/types";
+import { GetPaymentsProfile, NodeSoapLoginResponseHeaders, PaymentArguments } from "../types/types";
 import { uuidGenerator } from "../utils/uuidGenerator";
 import { xmlCodes } from "../config/citypayResponseCodes";
+import { isNodeSoapLoginResponseHeaders } from "../types/typeguards";
 
 export default class NodeSoap {
-  public options: {};
   public client: Client;
-  constructor(client: Client, options: {}) {
+  constructor(client: Client) {
     this.client = client;
-    this.options = options;
   }
   static async init(): Promise<NodeSoap> {
     try {
-      const options = { forever: true };
       const client: Client = await createClientAsync(
         path.join(path.dirname(__dirname), "api3.wsdl"),
         { endpoint: process.env.BILLING_URL }
       );
-      await client.LoginAsync(
-        { login: process.env.BILLING_LOGIN, pass: process.env.BILLING_PASS },
-        options
-      );
-      return new NodeSoap(client, options);
+      return new NodeSoap(client);
     } catch (error) {
       throw new Error(xmlCodes.int_error);
     }
   }
+  async managerLogin() {
+    await this.client.LoginAsync({
+      login: process.env.BILLING_LOGIN,
+      pass: process.env.BILLING_PASS,
+    });
+    if (!isNodeSoapLoginResponseHeaders(this.client.lastResponseHeaders)) {
+      throw new Error("Failed to login");
+    }
+    const responseHeaders: NodeSoapLoginResponseHeaders = this.client.lastResponseHeaders;
+    this.client.addHttpHeader("set-cookie", [responseHeaders["set-cookie"]]);
+  }
   async getServiceCategories(fltParams: {}) {
     const response = await this.client.getServiceCategoriesAsync(
-      fltParams,
-      this.options
+      fltParams
     );
     return response;
   }
   async getVgroups(fltParams: {}) {
-    const response = await this.client.getVgroupsAsync(fltParams, this.options);
+    const response = await this.client.getVgroupsAsync(fltParams);
     return response;
   }
   async getAccounts(fltParams: {}) {
     const response = await this.client.getAccountsAsync(
-      fltParams,
-      this.options
+      fltParams
       );
       return response;
       }
   async getAccount(fltParams: {}) {
-    const response = await this.client.getAccountAsync(fltParams, this.options);
+    const response = await this.client.getAccountAsync(fltParams);
     return response;
   }
   async getPayments(fltParams: {}) {
     const response = await this.client.getPaymentsAsync(
-      fltParams,
-      this.options
+      fltParams
     );
     return response;
   }
@@ -68,8 +70,7 @@ export default class NodeSoap {
           modperson,
           comment,
         },
-      },
-      this.options
+      }
     );
     return response;
   }
@@ -90,20 +91,18 @@ export default class NodeSoap {
           status: STATUS_CANCELLED,
           amount: ZERO_AMOUNT,
         },
-      },
-      this.options
+      }
     );
     return response;
   }
   async clientLogin(fltParams: {}) {
     const response = await this.client.ClientLoginAsync(
-      fltParams,
-      this.options
+      fltParams
     );
     return response;
   }
   async loginAsync(fltParams: {}) {
-    const response = await this.client.LoginAsync(fltParams, this.options);
+    const response = await this.client.LoginAsync(fltParams);
     return response;
   }
   async logoutAsync() {

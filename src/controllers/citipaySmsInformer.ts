@@ -10,26 +10,26 @@ import {
   isNodeSoapAccountResponse,
 } from "../types/typeguards";
 import { sendSms } from "../utils/sms";
-import NodeSoap from "../models/soap";
+import NodeSoap from "../models/soap_v2";
 
 export default class CitypaySmsInformer implements ICitypaySmsInformer {
   public req: Request;
-  public db: NodeSoap;
+  public soapModel: NodeSoap;
 
   constructor(req: Request, soapClient: NodeSoap) {
     this.req = req;
-    this.db = soapClient;
+    this.soapModel = soapClient;
   }
   async informViaSms(type: "pay" | "cancel"): Promise<void> {
     if (!isCitypayQuery(this.req.query)) {
       return;
     }
     // получаю данные учетной записи чтобы использовать баланс
-    const vgroup: NodeSoapVgroupResponse = await this.db.getVgroups({
+    const vgroup: NodeSoapVgroupResponse = await this.soapModel.getVgroups({
       flt: { login: this.req.query.Account },
     });
     // получаю данные пользователя чтобы использовать номер телефона
-    const account: NodeSoapAccountResponse = await this.db.getAccounts({
+    const account: NodeSoapAccountResponse = await this.soapModel.getAccounts({
       flt: { login: this.req.query.Account },
     });
     let smsBody = "";

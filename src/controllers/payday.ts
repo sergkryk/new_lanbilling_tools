@@ -1,9 +1,12 @@
 import { Request, Response, NextFunction } from "express";
-import { isNodeSoapGetPaymentsPaydayResponse, isPaydayQuery } from "../types/typeguards";
+import {
+  isNodeSoapGetPaymentsPaydayResponse,
+  isPaydayQuery,
+} from "../types/typeguards";
 import { GetPaymentsProfile } from "../types/types";
 import { convertToXml } from "../utils/xml";
 import { citypayErrorHandler } from "../utils/errorHandler";
-import NodeSoap from "../models/soap";
+import NodeSoap from "../models/soap_v2";
 
 const MODPERSON = 10;
 const PAYMENT_STATUS_COMPLETED = 0;
@@ -49,6 +52,7 @@ export const paydayController = async function (
 
     // Initialize database model
     const soapClient = await NodeSoap.init();
+    await soapClient.managerLogin();
 
     // Get payments from database
     const result = await soapClient.getPayments({
@@ -63,12 +67,14 @@ export const paydayController = async function (
       const payments = result[0].ret;
 
       // Filter payments based on conditions
-      const filteredPayments = payments.filter((el: GetPaymentsProfile): boolean => {
-        return (
-          el.pay.modperson === MODPERSON &&
-          el.pay.status === PAYMENT_STATUS_COMPLETED
-        );
-      });
+      const filteredPayments = payments.filter(
+        (el: GetPaymentsProfile): boolean => {
+          return (
+            el.pay.modperson === MODPERSON &&
+            el.pay.status === PAYMENT_STATUS_COMPLETED
+          );
+        }
+      );
 
       // Map payments to XML format
       const paymentsXml = filteredPayments.map((el: GetPaymentsProfile): {} => {
@@ -86,7 +92,7 @@ export const paydayController = async function (
           },
         };
       });
-
+      await soapClient.logoutAsync();
       // Set response content type and send XML response
       res.set("Content-Type", "text/xml");
       res.send(convertToXml(paymentsXml));

@@ -1,7 +1,7 @@
 import { randomUUID } from "crypto";
 
 export const uuidGenerator = function (): string {
-  const uuid = randomUUID().replaceAll("-", "");
+  const uuid = randomUUID().split("-").join("");
   let result = "";
 
   for (let i = 0; i < uuid.length; i++) {

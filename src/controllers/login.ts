@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { signToken } from "../utils/jwt";
-import NodeSoap from "../models/soap";
+import NodeSoap from "../models/soap_v2";
 import { isNodeSoapLoginResponse } from "../types/typeguards";
 
 export const loginController = async function (req: Request, res: Response) {

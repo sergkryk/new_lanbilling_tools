@@ -1,9 +1,9 @@
 import { Request } from "express";
-import NodeSoap from "../models/soap";
+import NodeSoap from "../models/soap_v2";
 
 export interface ICitypaySmsInformer {
   req: Request;
-  db: NodeSoap;
+  soapModel: NodeSoap;
   informViaSms(type: "pay" | "cancel"): Promise<void>;
 }
 
@@ -482,3 +482,11 @@ export type NodeSoapGetServiceResponse = [
   string,
   string | undefined
 ];
+
+export type NodeSoapLoginResponseHeaders = {
+  server: string;
+  'content-type': string;
+  'content-length': string;
+  connection: string;
+  'set-cookie': string[];
+}
