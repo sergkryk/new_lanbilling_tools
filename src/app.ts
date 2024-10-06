@@ -40,9 +40,6 @@ async function main() {
 }
 
 // main();
-const OPENCLIENT_URL = "https://check.business.ru/open-api/v1/";
-const APP_ID = "16560494";
-const SECRET = "UushIC";
 
 const onlineCheck = new OpenClient()
 
