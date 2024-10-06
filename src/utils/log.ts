@@ -1,5 +1,5 @@
 import fs from "fs";
-import { isCitypayQuery } from "../types/typeguards";
+import { isCitypayCheck, isCitypayQuery } from "../types/typeguards";
 import { Request } from "express";
 
 const QUERIES_FILE = "queries.txt";
@@ -12,9 +12,7 @@ const logger = function (filename: string, message: string) {
 };
 
 export const httpQueryLogger = function (req: Request) {
-  const message = isCitypayQuery(req.query)
-    ? `Тип запроса: ${req.query.QueryType}. Учетная запись: ${req.query.Account}. Сумма: ${req.query.Amount}. Идентификатор запроса: ${req.query.TransactionId}.\n`
-    : `Неверный формат запроса ${JSON.stringify(req.query)}\n`;
+  const message = JSON.stringify(req.query)+"\n";
   logger(QUERIES_FILE, message);
 };
 

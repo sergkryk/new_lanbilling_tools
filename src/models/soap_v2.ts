@@ -1,6 +1,6 @@
-import { Client, createClientAsync, IOptions } from "soap";
+import { Client, createClientAsync } from "soap";
 import path from "path";
-import { GetPaymentsProfile, NodeSoapLoginResponseHeaders, PaymentArguments } from "../types/types";
+import { GetPaymentsProfile, PaymentArguments } from "../types/types";
 import { uuidGenerator } from "../utils/uuidGenerator";
 import { xmlCodes } from "../config/citypayResponseCodes";
 import { isNodeSoapLoginResponseHeaders } from "../types/typeguards";
@@ -29,8 +29,10 @@ export default class NodeSoap {
     if (!isNodeSoapLoginResponseHeaders(this.client.lastResponseHeaders)) {
       throw new Error("Failed to login");
     }
-    const responseHeaders: NodeSoapLoginResponseHeaders = this.client.lastResponseHeaders;
-    this.client.addHttpHeader("set-cookie", [responseHeaders["set-cookie"]]);
+    this.addAuthorisationHttpHeader(this.client.lastResponseHeaders["set-cookie"])
+  }
+  addAuthorisationHttpHeader(sessnum: string[]) {
+    this.client.addHttpHeader("set-cookie", sessnum);
   }
   async getServiceCategories(fltParams: {}) {
     const response = await this.client.getServiceCategoriesAsync(
@@ -59,7 +61,7 @@ export default class NodeSoap {
     return response;
   }
   async payment(params: PaymentArguments) {
-    const { agrmid, amount, modperson, comment = "", transactionId } = params;
+    const { agrmid, amount, modperson = "", comment = "", transactionId } = params;
     const receipt = transactionId || `${agrmid}-${uuidGenerator()}`;
     const response = await this.client.PaymentAsync(
       {

@@ -10,10 +10,10 @@ const options = {
   expiresIn: "2 days",
 };
 
-export const signToken = function (personid: string) {
+export const signToken = function (cookie: string) {
   const token = jwt.sign(
     {
-      personid,
+      "set-cookie": cookie,
     },
     SECRET_KEY,
     options

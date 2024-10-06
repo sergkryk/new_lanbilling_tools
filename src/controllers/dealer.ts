@@ -5,8 +5,10 @@ import {
   isNodeSoapPaymentResponse,
   isNodeSoapVgroupResponse,
   isPayFormBody,
+  isToken,
 } from "../types/typeguards";
 import NodeSoap from "../models/soap_v2";
+import OpenClient from "../models/openClient";
 
 // Function to modify request object for Citypay query
 const getCitypayQueryObj = (req: Request, sum: string): Request => {
@@ -20,24 +22,33 @@ const getCitypayQueryObj = (req: Request, sum: string): Request => {
   Object.assign(req.query, citypayKeys);
   return req;
 };
-
+// GET Controller
 export const checkController = async function (
   req: Request,
   res: Response
 ): Promise<void> {
   try {
+
+    const lanbillingToken = req.body.token;
+    if (!isToken(lanbillingToken)) {
+      res.redirect("login");
+    }
+
     const account = req.query?.account;
     if (!account || typeof account !== "string") {
       throw new Error();
     }
+
     const soapClient = await NodeSoap.init();
-    await soapClient.managerLogin()
+    soapClient.addAuthorisationHttpHeader([lanbillingToken["set-cookie"]]);
+
     const vgroupRequest = await soapClient.getVgroups({
       flt: { login: account },
     });
     if (!isNodeSoapVgroupResponse(vgroupRequest)) {
       throw new Error();
     }
+
     const { username, login, tarifdescr, balance, address, agrmid } =
       vgroupRequest[0].ret[0];
     res.render("pay", {
@@ -49,34 +60,34 @@ export const checkController = async function (
       balance: balance,
       tariff: tarifdescr,
     });
-    await soapClient.logoutAsync();
   } catch (error) {
     res.render("check", { title: "Initial State", notFound: false });
     return;
   }
 };
 
+// POST controller
 export const payController = async function (req: Request, res: Response) {
   try {
     // Validate request body
     if (!isPayFormBody(req.body)) {
       throw new Error();
     }
+    // Extract required fields from request body
+    const { agrmid, sum, token } = req.body;
     // Initialize database model
     const soapClient = await NodeSoap.init();
-    // Authentificate database model
-    await soapClient.managerLogin();
-    // Extract required fields from request body
-    const { agrmid, sum, admin } = req.body;
+    soapClient.addAuthorisationHttpHeader([token["set-cookie"]])
     // Modify request object to add necessary fields for SMS notification
     const updatedReq = getCitypayQueryObj(req, sum);
     // Create an instance of CitypaySmsInformer
     const informer = new CitypaySmsInformer(updatedReq, soapClient);
+    // Create an instance of BussinessCheck Client
+    const onlineCheck = new OpenClient()
     // Process payment
     const payment = await soapClient.payment({
       agrmid,
       amount: sum,
-      modperson: admin["personid"],
     });
     // // Check if payment response is valid
     if (!isNodeSoapPaymentResponse(payment)) {
@@ -89,8 +100,6 @@ export const payController = async function (req: Request, res: Response) {
     httpQueryLogger(req);
     // // Send SMS notification to the user
     await informer.informViaSms("pay");
-    // Logout db model
-    await soapClient.logoutAsync();
     // // Render success page with payment details
     res.render("success", {
       sum,

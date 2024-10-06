@@ -1,8 +1,8 @@
 import { Router } from "express";
-import { citypay } from "../controllers/citypay";
+import { citypayController } from "../controllers/citypay";
 
 const postofficeRouter = Router();
 
-postofficeRouter.get("/", citypay);
+postofficeRouter.get("/", citypayController);
 
 export default postofficeRouter;

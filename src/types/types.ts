@@ -7,10 +7,12 @@ export interface ICitypaySmsInformer {
   informViaSms(type: "pay" | "cancel"): Promise<void>;
 }
 
+export type citipayQueryTypes = "check" | "pay" | "cancel"
+
 export type PaymentArguments = {
   agrmid: string;
   amount: string;
-  modperson: string;
+  modperson?: string;
   comment?: string;
   transactionId?: string;
 };
@@ -19,8 +21,8 @@ export type PayFormBody = {
   agrmid: string;
   sum: string;
   phone: string;
-  admin: {
-    personid: string;
+  token: {
+    "set-cookie": string;
     iat: string;
     exp: string;
   };
@@ -29,10 +31,16 @@ export type PayFormBody = {
 export type CitypayQuery = {
   QueryType: "check" | "pay" | "cancel";
   TransactionId: string;
-  TransactionDate: string;
+  TransactionDate?: string;
   Account: string;
   Amount: string;
   comment?: string;
+};
+
+export type CitypayCheck = {
+  QueryType: "check" | "pay" | "cancel";
+  TransactionId: string;
+  Account: string;
 };
 
 export type SMSoptions = {
@@ -489,4 +497,14 @@ export type NodeSoapLoginResponseHeaders = {
   'content-length': string;
   connection: string;
   'set-cookie': string[];
+}
+
+export type CookiesToken = {
+  token: string;
+}
+
+export type Token = {
+  'set-cookie': string;
+  iat: number;
+  exp: number;
 }

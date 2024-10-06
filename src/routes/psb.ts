@@ -1,8 +1,8 @@
 import { Router } from "express";
-import { citypay } from "../controllers/citypay";
+import { citypayController } from "../controllers/citypay";
 
 const psbRouter = Router();
 
-psbRouter.get("/", citypay);
+psbRouter.get("/", citypayController);
 
 export default psbRouter;

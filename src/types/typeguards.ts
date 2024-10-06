@@ -22,6 +22,9 @@ import {
   ServiceProfile,
   NodeSoapGetServiceResponse,
   NodeSoapLoginResponseHeaders,
+  CookiesToken,
+  Token,
+  CitypayCheck,
 } from "./types";
 
 export const isPayFormBody = function (
@@ -32,7 +35,7 @@ export const isPayFormBody = function (
       "agrmid" in payload &&
       "sum" in payload &&
       "phone" in payload &&
-      "admin" in payload
+      "token" in payload
     );
   }
   return false;
@@ -45,9 +48,21 @@ export const isCitypayQuery = function (
     return (
       "QueryType" in payload &&
       "TransactionId" in payload &&
-      "TransactionDate" in payload &&
       "Account" in payload &&
       "Amount" in payload
+    );
+  }
+  return false;
+};
+
+export const isCitypayCheck = function (
+  payload: unknown
+): payload is CitypayCheck {
+  if (typeof payload === "object" && payload !== null) {
+    return (
+      "QueryType" in payload &&
+      "TransactionId" in payload &&
+      "Account" in payload
     );
   }
   return false;
@@ -238,30 +253,32 @@ export const isGetPaymentsPayRecord = function (
   );
 };
 
-export const isGetPaymentsProfile = function(obj: any): obj is GetPaymentsProfile {
+export const isGetPaymentsProfile = function (
+  obj: any
+): obj is GetPaymentsProfile {
   return (
-    typeof obj === 'object' &&
+    typeof obj === "object" &&
     obj !== null &&
     isGetPaymentsPayRecord(obj.pay) &&
-    typeof obj.bsodoc === 'number' &&
-    typeof obj.timestamp === 'number' &&
-    typeof obj.localtimestamp === 'number' &&
-    typeof obj.amountcurr === 'number' &&
-    typeof obj.ordernum === 'string' &&
-    typeof obj.uid === 'number' &&
-    typeof obj.operid === 'number' &&
-    typeof obj.cardnumber === 'number' &&
-    typeof obj.currsymb === 'string' &&
-    typeof obj.uname === 'string' &&
-    typeof obj.agrm === 'string' &&
-    typeof obj.mgr === 'string' &&
-    typeof obj.mgrdescr === 'string' &&
-    typeof obj.mgrlogin === 'string' &&
-    typeof obj.opername === 'string' &&
-    typeof obj.login === 'string' &&
-    typeof obj.iseps === 'boolean'
+    typeof obj.bsodoc === "number" &&
+    typeof obj.timestamp === "number" &&
+    typeof obj.localtimestamp === "number" &&
+    typeof obj.amountcurr === "number" &&
+    typeof obj.ordernum === "string" &&
+    typeof obj.uid === "number" &&
+    typeof obj.operid === "number" &&
+    typeof obj.cardnumber === "number" &&
+    typeof obj.currsymb === "string" &&
+    typeof obj.uname === "string" &&
+    typeof obj.agrm === "string" &&
+    typeof obj.mgr === "string" &&
+    typeof obj.mgrdescr === "string" &&
+    typeof obj.mgrlogin === "string" &&
+    typeof obj.opername === "string" &&
+    typeof obj.login === "string" &&
+    typeof obj.iseps === "boolean"
   );
-}
+};
 
 export const isNodeSoapLoginResponse = function (
   obj: any
@@ -338,284 +355,316 @@ export const isNodeSoapGetPaymentsResponse = function (
   return (
     Array.isArray(obj) &&
     obj.length === 5 &&
-    typeof obj[0] === 'object' &&
+    typeof obj[0] === "object" &&
     obj[0] !== null &&
     Array.isArray(obj[0].ret) &&
     obj[0].ret.length > 0 &&
     isGetPaymentsProfile(obj[0].ret[0]) &&
-    typeof obj[1] === 'string' &&
-    (typeof obj[2] === 'undefined' || typeof obj[2] === 'string') &&
-    typeof obj[3] === 'string' &&
-    (typeof obj[4] === 'undefined' || typeof obj[4] === 'string')
+    typeof obj[1] === "string" &&
+    (typeof obj[2] === "undefined" || typeof obj[2] === "string") &&
+    typeof obj[3] === "string" &&
+    (typeof obj[4] === "undefined" || typeof obj[4] === "string")
   );
 };
 
-export const isNodeSoapGetPaymentsPaydayResponse = function(obj: any): obj is NodeSoapGetPaymentsPaydayResponse {
+export const isNodeSoapGetPaymentsPaydayResponse = function (
+  obj: any
+): obj is NodeSoapGetPaymentsPaydayResponse {
   return (
     Array.isArray(obj) &&
     obj.length === 5 &&
-    typeof obj[0] === 'object' &&
+    typeof obj[0] === "object" &&
     obj[0] !== null &&
-    Array.isArray(obj[0].ret) && obj[0].ret.every(isGetPaymentsProfile) &&
-    typeof obj[1] === 'string' &&
-    (typeof obj[2] === 'undefined' || typeof obj[2] === 'string') &&
-    typeof obj[3] === 'string' &&
-    (typeof obj[4] === 'undefined' || typeof obj[4] === 'string')
+    Array.isArray(obj[0].ret) &&
+    obj[0].ret.every(isGetPaymentsProfile) &&
+    typeof obj[1] === "string" &&
+    (typeof obj[2] === "undefined" || typeof obj[2] === "string") &&
+    typeof obj[3] === "string" &&
+    (typeof obj[4] === "undefined" || typeof obj[4] === "string")
   );
-}
+};
 
-export const isClientLoginResponseRet = function(obj: any): obj is { uid: number; timelastlogin: string } {
+export const isClientLoginResponseRet = function (
+  obj: any
+): obj is { uid: number; timelastlogin: string } {
   return (
-    typeof obj === 'object' &&
+    typeof obj === "object" &&
     obj !== null &&
-    typeof obj.uid === 'number' &&
-    typeof obj.timelastlogin === 'string'
+    typeof obj.uid === "number" &&
+    typeof obj.timelastlogin === "string"
   );
-}
+};
 
-export const isNodeSoapClientLoginResponse = function(obj: any): obj is NodeSoapClientLoginResponse {
+export const isNodeSoapClientLoginResponse = function (
+  obj: any
+): obj is NodeSoapClientLoginResponse {
   return (
     Array.isArray(obj) &&
     obj.length === 5 &&
-    typeof obj[0] === 'object' &&
+    typeof obj[0] === "object" &&
     obj[0] !== null &&
     Array.isArray(obj[0].ret) &&
     obj[0].ret.length === 1 &&
     isClientLoginResponseRet(obj[0].ret[0]) &&
-    typeof obj[1] === 'string' &&
-    (typeof obj[2] === 'undefined' || typeof obj[2] === 'string') &&
-    typeof obj[3] === 'string' &&
-    (typeof obj[4] === 'undefined' || typeof obj[4] === 'string')
+    typeof obj[1] === "string" &&
+    (typeof obj[2] === "undefined" || typeof obj[2] === "string") &&
+    typeof obj[3] === "string" &&
+    (typeof obj[4] === "undefined" || typeof obj[4] === "string")
   );
-}
+};
 
 function isAccountProfileFull(obj: any): obj is AccountProfileFull {
   return (
-    typeof obj === 'object' &&
+    typeof obj === "object" &&
     obj !== null &&
-    typeof obj.uid === 'number' &&
-    typeof obj.doctype === 'number' &&
-    typeof obj.ipaccess === 'number' &&
-    typeof obj.billdelivery === 'number' &&
-    typeof obj.category === 'number' &&
-    typeof obj.type === 'number' &&
-    typeof obj.oksm === 'number' &&
-    typeof obj.templ === 'number' &&
-    typeof obj.wrongactive === 'number' &&
-    typeof obj.archive === 'number' &&
-    typeof obj.ownership === 'number' &&
-    typeof obj.mobileisconfirmed === 'boolean' &&
-    typeof obj.emailisconfirmed === 'boolean' &&
-    typeof obj.offerisaccepted === 'boolean' &&
-    typeof obj.soleproprietor === 'boolean' &&
-    typeof obj.login === 'string' &&
-    typeof obj.pass === 'string' &&
-    typeof obj.descr === 'string' &&
-    typeof obj.name === 'string' &&
-    typeof obj.phone === 'string' &&
-    typeof obj.fax === 'string' &&
-    typeof obj.email === 'string' &&
-    typeof obj.mobile === 'string' &&
-    typeof obj.bankname === 'string' &&
-    typeof obj.branchbankname === 'string' &&
-    typeof obj.treasuryname === 'string' &&
-    typeof obj.treasuryaccount === 'string' &&
-    typeof obj.bik === 'string' &&
-    typeof obj.settl === 'string' &&
-    typeof obj.corr === 'string' &&
-    typeof obj.kpp === 'string' &&
-    typeof obj.inn === 'string' &&
-    typeof obj.ogrn === 'string' &&
-    typeof obj.okpo === 'string' &&
-    typeof obj.okved === 'string' &&
-    typeof obj.gendiru === 'string' &&
-    typeof obj.glbuhgu === 'string' &&
-    typeof obj.kontperson === 'string' &&
-    typeof obj.actonwhat === 'string' &&
-    typeof obj.passsernum === 'string' &&
-    typeof obj.passno === 'string' &&
-    typeof obj.passissuedate === 'string' &&
-    typeof obj.passissuedep === 'string' &&
-    typeof obj.passissueplace === 'string' &&
-    typeof obj.birthdate === 'string' &&
-    typeof obj.birthplace === 'string' &&
-    typeof obj.lastmoddate === 'string' &&
-    typeof obj.wrongdate === 'string' &&
-    typeof obj.okato === 'string' &&
-    typeof obj.uuid === 'string' &&
-    typeof obj.abonentname === 'string' &&
-    typeof obj.abonentsurname === 'string' &&
-    typeof obj.abonentpatronymic === 'string' &&
-    typeof obj.managerid === 'number' &&
-    typeof obj.managername === 'string' &&
-    typeof obj.managerlogin === 'string' &&
-    typeof obj.swift === 'string' &&
-    typeof obj.kio === 'string' &&
-    typeof obj.bicbei === 'string' &&
-    typeof obj.iban === 'string' &&
-    typeof obj.bankcorr === 'string' &&
-    typeof obj.bankcorrcode === 'string' &&
-    typeof obj.bankcorraccount === 'string' &&
-    typeof obj.currency === 'string' &&
-    typeof obj.resident === 'number'
+    typeof obj.uid === "number" &&
+    typeof obj.doctype === "number" &&
+    typeof obj.ipaccess === "number" &&
+    typeof obj.billdelivery === "number" &&
+    typeof obj.category === "number" &&
+    typeof obj.type === "number" &&
+    typeof obj.oksm === "number" &&
+    typeof obj.templ === "number" &&
+    typeof obj.wrongactive === "number" &&
+    typeof obj.archive === "number" &&
+    typeof obj.ownership === "number" &&
+    typeof obj.mobileisconfirmed === "boolean" &&
+    typeof obj.emailisconfirmed === "boolean" &&
+    typeof obj.offerisaccepted === "boolean" &&
+    typeof obj.soleproprietor === "boolean" &&
+    typeof obj.login === "string" &&
+    typeof obj.pass === "string" &&
+    typeof obj.descr === "string" &&
+    typeof obj.name === "string" &&
+    typeof obj.phone === "string" &&
+    typeof obj.fax === "string" &&
+    typeof obj.email === "string" &&
+    typeof obj.mobile === "string" &&
+    typeof obj.bankname === "string" &&
+    typeof obj.branchbankname === "string" &&
+    typeof obj.treasuryname === "string" &&
+    typeof obj.treasuryaccount === "string" &&
+    typeof obj.bik === "string" &&
+    typeof obj.settl === "string" &&
+    typeof obj.corr === "string" &&
+    typeof obj.kpp === "string" &&
+    typeof obj.inn === "string" &&
+    typeof obj.ogrn === "string" &&
+    typeof obj.okpo === "string" &&
+    typeof obj.okved === "string" &&
+    typeof obj.gendiru === "string" &&
+    typeof obj.glbuhgu === "string" &&
+    typeof obj.kontperson === "string" &&
+    typeof obj.actonwhat === "string" &&
+    typeof obj.passsernum === "string" &&
+    typeof obj.passno === "string" &&
+    typeof obj.passissuedate === "string" &&
+    typeof obj.passissuedep === "string" &&
+    typeof obj.passissueplace === "string" &&
+    typeof obj.birthdate === "string" &&
+    typeof obj.birthplace === "string" &&
+    typeof obj.lastmoddate === "string" &&
+    typeof obj.wrongdate === "string" &&
+    typeof obj.okato === "string" &&
+    typeof obj.uuid === "string" &&
+    typeof obj.abonentname === "string" &&
+    typeof obj.abonentsurname === "string" &&
+    typeof obj.abonentpatronymic === "string" &&
+    typeof obj.managerid === "number" &&
+    typeof obj.managername === "string" &&
+    typeof obj.managerlogin === "string" &&
+    typeof obj.swift === "string" &&
+    typeof obj.kio === "string" &&
+    typeof obj.bicbei === "string" &&
+    typeof obj.iban === "string" &&
+    typeof obj.bankcorr === "string" &&
+    typeof obj.bankcorrcode === "string" &&
+    typeof obj.bankcorraccount === "string" &&
+    typeof obj.currency === "string" &&
+    typeof obj.resident === "number"
   );
 }
 
 function isUserGroupFull(obj: any): obj is UserGroupFull {
   return (
-    typeof obj === 'object' &&
+    typeof obj === "object" &&
     obj !== null &&
-    typeof obj.usercnt === 'number' &&
-    typeof obj.fread === 'number' &&
-    typeof obj.fwrite === 'number' &&
-    typeof obj.defaultgroup === 'number'
+    typeof obj.usercnt === "number" &&
+    typeof obj.fread === "number" &&
+    typeof obj.fwrite === "number" &&
+    typeof obj.defaultgroup === "number"
     // Define further properties of usergroup if known
   );
 }
 
 function isAddressFull(obj: any): obj is AddressFull {
   return (
-    typeof obj === 'object' &&
+    typeof obj === "object" &&
     obj !== null &&
-    typeof obj.type === 'number' &&
-    typeof obj.code === 'string' &&
-    typeof obj.address === 'string'
+    typeof obj.type === "number" &&
+    typeof obj.code === "string" &&
+    typeof obj.address === "string"
   );
 }
 
 function isAgreementFull(obj: any): obj is AgreementFull {
   return (
-    typeof obj === 'object' &&
+    typeof obj === "object" &&
     obj !== null &&
-    typeof obj.agrmid === 'number' &&
-    typeof obj.uid === 'number' &&
-    typeof obj.operid === 'number' &&
-    typeof obj.curid === 'number' &&
-    typeof obj.bnotify === 'number' &&
-    typeof obj.archive === 'number' &&
-    typeof obj.vgroups === 'number' &&
-    typeof obj.penaltymethod === 'string' &&
-    typeof obj.monthblockday === 'string' &&
-    typeof obj.agrmtype === 'string' &&
-    typeof obj.balance === 'number' &&
-    typeof obj.balanceacc === 'number' &&
-    typeof obj.credit === 'number' &&
-    typeof obj.promisecredit === 'number' &&
-    typeof obj.installments === 'number' &&
-    typeof obj.balancestrictlimit === 'number' &&
-    typeof obj.blimit === 'number' &&
-    typeof obj.balancestatus === 'string' &&
-    typeof obj.isauto === 'number' &&
-    typeof obj.friendagrmid === 'number' &&
-    typeof obj.parentagrmid === 'number' &&
-    typeof obj.paymentmethod === 'number' &&
-    typeof obj.blockdays === 'number' &&
-    typeof obj.blockmonths === 'number' &&
-    typeof obj.orderpayday === 'number' &&
-    typeof obj.blockorders === 'number' &&
-    typeof obj.blockamount === 'number' &&
-    typeof obj.priority === 'number' &&
-    typeof obj.ownerid === 'number' &&
-    typeof obj.isdefault === 'number' &&
-    typeof obj.nofinblock === 'number' &&
-    typeof obj.friendnumber === 'string' &&
-    typeof obj.parentnumber === 'string' &&
-    typeof obj.balancelimitexceeded === 'string' &&
-    typeof obj.number === 'string' &&
-    typeof obj.code === 'string' &&
-    typeof obj.date === 'string' &&
-    typeof obj.closedon === 'string' &&
-    typeof obj.datevalidto === 'string' &&
-    typeof obj.bcheck === 'string' &&
-    typeof obj.symbol === 'string' &&
-    typeof obj.username === 'string' &&
-    typeof obj.opername === 'string' &&
-    typeof obj.agreementidbopos === 'string' &&
-    typeof obj.descr === 'string' &&
-    typeof obj.balancetext === 'string' &&
-    typeof obj.initialbalance === 'number' &&
-    typeof obj.errormessage === 'string'
+    typeof obj.agrmid === "number" &&
+    typeof obj.uid === "number" &&
+    typeof obj.operid === "number" &&
+    typeof obj.curid === "number" &&
+    typeof obj.bnotify === "number" &&
+    typeof obj.archive === "number" &&
+    typeof obj.vgroups === "number" &&
+    typeof obj.penaltymethod === "string" &&
+    typeof obj.monthblockday === "string" &&
+    typeof obj.agrmtype === "string" &&
+    typeof obj.balance === "number" &&
+    typeof obj.balanceacc === "number" &&
+    typeof obj.credit === "number" &&
+    typeof obj.promisecredit === "number" &&
+    typeof obj.installments === "number" &&
+    typeof obj.balancestrictlimit === "number" &&
+    typeof obj.blimit === "number" &&
+    typeof obj.balancestatus === "string" &&
+    typeof obj.isauto === "number" &&
+    typeof obj.friendagrmid === "number" &&
+    typeof obj.parentagrmid === "number" &&
+    typeof obj.paymentmethod === "number" &&
+    typeof obj.blockdays === "number" &&
+    typeof obj.blockmonths === "number" &&
+    typeof obj.orderpayday === "number" &&
+    typeof obj.blockorders === "number" &&
+    typeof obj.blockamount === "number" &&
+    typeof obj.priority === "number" &&
+    typeof obj.ownerid === "number" &&
+    typeof obj.isdefault === "number" &&
+    typeof obj.nofinblock === "number" &&
+    typeof obj.friendnumber === "string" &&
+    typeof obj.parentnumber === "string" &&
+    typeof obj.balancelimitexceeded === "string" &&
+    typeof obj.number === "string" &&
+    typeof obj.code === "string" &&
+    typeof obj.date === "string" &&
+    typeof obj.closedon === "string" &&
+    typeof obj.datevalidto === "string" &&
+    typeof obj.bcheck === "string" &&
+    typeof obj.symbol === "string" &&
+    typeof obj.username === "string" &&
+    typeof obj.opername === "string" &&
+    typeof obj.agreementidbopos === "string" &&
+    typeof obj.descr === "string" &&
+    typeof obj.balancetext === "string" &&
+    typeof obj.initialbalance === "number" &&
+    typeof obj.errormessage === "string"
   );
 }
 
-export const isNodeSoapAccountFullResponse = function(obj: any): obj is NodeSoapAccountFullResponse {
+export const isNodeSoapAccountFullResponse = function (
+  obj: any
+): obj is NodeSoapAccountFullResponse {
   return (
     Array.isArray(obj) &&
     obj.length === 5 &&
-    typeof obj[0] === 'object' &&
+    typeof obj[0] === "object" &&
     obj[0] !== null &&
     Array.isArray(obj[0].ret) &&
     obj[0].ret.length > 0 &&
-    typeof obj[0].ret[0].application === 'number' &&
-    typeof obj[0].ret[0].billdeliveryname === 'string' &&
+    typeof obj[0].ret[0].application === "number" &&
+    typeof obj[0].ret[0].billdeliveryname === "string" &&
     isAccountProfileFull(obj[0].ret[0].account) &&
-    Array.isArray(obj[0].ret[0].usergroups) && obj[0].ret[0].usergroups.every(isUserGroupFull) &&
-    Array.isArray(obj[0].ret[0].addresses) && obj[0].ret[0].addresses.every(isAddressFull) &&
-    Array.isArray(obj[0].ret[0].agreements) && obj[0].ret[0].agreements.every(isAgreementFull)
+    Array.isArray(obj[0].ret[0].usergroups) &&
+    obj[0].ret[0].usergroups.every(isUserGroupFull) &&
+    Array.isArray(obj[0].ret[0].addresses) &&
+    obj[0].ret[0].addresses.every(isAddressFull) &&
+    Array.isArray(obj[0].ret[0].agreements) &&
+    obj[0].ret[0].agreements.every(isAgreementFull)
   );
-}
+};
 
 function isServiceProfile(obj: any): obj is ServiceProfile {
   return (
-    typeof obj === 'object' &&
+    typeof obj === "object" &&
     obj !== null &&
-    typeof obj.technicalservice === 'number' &&
-    typeof obj.beginperiod === 'number' &&
-    typeof obj.tarid === 'number' &&
-    typeof obj.catidx === 'number' &&
-    typeof obj.externalservice === 'number' &&
-    typeof obj.uuid === 'string' &&
-    typeof obj.above === 'number' &&
-    typeof obj.usrblockabove === 'number' &&
-    typeof obj.admblockabove === 'number' &&
-    typeof obj.permabove === 'number' &&
-    typeof obj.includeabove === 'number' &&
-    typeof obj.rentperiod === 'number' &&
-    typeof obj.rentperiodmonth === 'number' &&
-    typeof obj.descr === 'string' &&
-    typeof obj.archive === 'number' &&
-    typeof obj.catid === 'number' &&
-    typeof obj.servcatid === 'number' &&
-    typeof obj.isunique === 'number' &&
-    typeof obj.scriptoff === 'string' &&
-    typeof obj.script === 'string' &&
-    typeof obj.link === 'string' &&
-    typeof obj.autoassign === 'number' &&
-    typeof obj.servtypeid === 'number' &&
-    typeof obj.servtypename === 'string' &&
-    typeof obj.tarname === 'string' &&
-    typeof obj.saledictionaryid === 'number' &&
-    typeof obj.keepturnedon === 'number' &&
-    typeof obj.available === 'number' &&
-    typeof obj.usrcansetmul === 'number' &&
-    typeof obj.usrmaxmul === 'number' &&
-    typeof obj.dtvtype === 'number' &&
-    typeof obj.servicetype === 'number' &&
-    typeof obj.descrfull === 'string' &&
-    typeof obj.checkactivehours === 'number' &&
-    typeof obj.externalcharge === 'number' &&
-    typeof obj.currsymbol === 'string' &&
-    typeof obj.publicoffer === 'string' &&
-    typeof obj.paymentobject === 'number' &&
-    typeof obj.promoperiod === 'number'
+    typeof obj.technicalservice === "number" &&
+    typeof obj.beginperiod === "number" &&
+    typeof obj.tarid === "number" &&
+    typeof obj.catidx === "number" &&
+    typeof obj.externalservice === "number" &&
+    typeof obj.uuid === "string" &&
+    typeof obj.above === "number" &&
+    typeof obj.usrblockabove === "number" &&
+    typeof obj.admblockabove === "number" &&
+    typeof obj.permabove === "number" &&
+    typeof obj.includeabove === "number" &&
+    typeof obj.rentperiod === "number" &&
+    typeof obj.rentperiodmonth === "number" &&
+    typeof obj.descr === "string" &&
+    typeof obj.archive === "number" &&
+    typeof obj.catid === "number" &&
+    typeof obj.servcatid === "number" &&
+    typeof obj.isunique === "number" &&
+    typeof obj.scriptoff === "string" &&
+    typeof obj.script === "string" &&
+    typeof obj.link === "string" &&
+    typeof obj.autoassign === "number" &&
+    typeof obj.servtypeid === "number" &&
+    typeof obj.servtypename === "string" &&
+    typeof obj.tarname === "string" &&
+    typeof obj.saledictionaryid === "number" &&
+    typeof obj.keepturnedon === "number" &&
+    typeof obj.available === "number" &&
+    typeof obj.usrcansetmul === "number" &&
+    typeof obj.usrmaxmul === "number" &&
+    typeof obj.dtvtype === "number" &&
+    typeof obj.servicetype === "number" &&
+    typeof obj.descrfull === "string" &&
+    typeof obj.checkactivehours === "number" &&
+    typeof obj.externalcharge === "number" &&
+    typeof obj.currsymbol === "string" &&
+    typeof obj.publicoffer === "string" &&
+    typeof obj.paymentobject === "number" &&
+    typeof obj.promoperiod === "number"
   );
 }
 
-export const isNodeSoapGetServiceResponse = function(obj: any): obj is NodeSoapGetServiceResponse {
+export const isNodeSoapGetServiceResponse = function (
+  obj: any
+): obj is NodeSoapGetServiceResponse {
   return (
     Array.isArray(obj) &&
     obj.length === 5 &&
     Array.isArray(obj[0].ret) &&
     obj[0].ret.every(isServiceProfile)
   );
-}
+};
 
-export const isNodeSoapLoginResponseHeaders = function(obj: any): obj is NodeSoapLoginResponseHeaders {
+export const isNodeSoapLoginResponseHeaders = function (
+  obj: any
+): obj is NodeSoapLoginResponseHeaders {
+  return (
+    typeof obj === "object" &&
+    typeof obj.server === "string" &&
+    typeof obj["content-type"] === "string" &&
+    typeof obj["content-length"] === "string" &&
+    typeof obj.connection === "string" &&
+    Array.isArray(obj["set-cookie"]) &&
+    obj["set-cookie"].every((item: any) => typeof item === "string")
+  );
+};
+
+export const isCookiesToken = function (obj: any): obj is CookiesToken {
+  return (
+    typeof obj === "object" && obj !== null && typeof obj.token === "string"
+  );
+};
+
+export const isToken = function(obj: any): obj is Token {
   return typeof obj === 'object' &&
-      typeof obj.server === 'string' &&
-      typeof obj['content-type'] === 'string' &&
-      typeof obj['content-length'] === 'string' &&
-      typeof obj.connection === 'string' &&
-      Array.isArray(obj['set-cookie']) &&
-      obj['set-cookie'].every((item: any) => typeof item === 'string');
+         obj !== null &&
+         typeof obj['set-cookie'] === 'string' &&
+         typeof obj.iat === 'number' &&
+         typeof obj.exp === 'number';
 }
