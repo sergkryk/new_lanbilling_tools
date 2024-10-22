@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { signToken } from "../utils/jwt";
-import NodeSoap from "../models/soap_v2";
+import NodeSoap from "../models/soap";
 import { isNodeSoapLoginResponseHeaders } from "../types/typeguards";
 const TOKEN_LIFESPAN = 7000*1000; // время жизни токена 12 часов
 

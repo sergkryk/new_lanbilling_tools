@@ -6,7 +6,7 @@ import {
 import { GetPaymentsProfile } from "../types/types";
 import { convertToXml } from "../utils/xml";
 import { citypayErrorHandler } from "../utils/errorHandler";
-import NodeSoap from "../models/soap_v2";
+import NodeSoap from "../models/soap";
 
 const MODPERSON = 10;
 const PAYMENT_STATUS_COMPLETED = 0;

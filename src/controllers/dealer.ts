@@ -7,8 +7,7 @@ import {
   isPayFormBody,
   isToken,
 } from "../types/typeguards";
-import NodeSoap from "../models/soap_v2";
-import OpenClient from "../models/openClient";
+import NodeSoap from "../models/soap";
 
 // Function to modify request object for Citypay query
 const getCitypayQueryObj = (req: Request, sum: string): Request => {
@@ -82,9 +81,7 @@ export const payController = async function (req: Request, res: Response) {
     const updatedReq = getCitypayQueryObj(req, sum);
     // Create an instance of CitypaySmsInformer
     const informer = new CitypaySmsInformer(updatedReq, soapClient);
-    // Create an instance of BussinessCheck Client
-    const onlineCheck = new OpenClient()
-    // Process payment
+    // Send payment to the billing
     const payment = await soapClient.payment({
       agrmid,
       amount: sum,

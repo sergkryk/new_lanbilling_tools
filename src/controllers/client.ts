@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import NodeSoap from "../models/soap_v2";
+import NodeSoap from "../models/soap";
 import {
   isNodeSoapAccountFullResponse,
   isNodeSoapClientLoginResponse,

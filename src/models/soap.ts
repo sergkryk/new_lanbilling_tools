@@ -1,9 +1,15 @@
 import { Client, createClientAsync } from "soap";
 import path from "path";
-import { GetPaymentsProfile, PaymentArguments } from "../types/types";
+import {
+  GetPaymentsProfile,
+  PaymentArguments,
+  PrintCheckResponse,
+} from "../types/types";
 import { uuidGenerator } from "../utils/uuidGenerator";
 import { xmlCodes } from "../config/citypayResponseCodes";
 import { isNodeSoapLoginResponseHeaders } from "../types/typeguards";
+import { printCheckCommand } from "../utils/printCheckCommand";
+import OpenClient from "./openClient";
 
 export default class NodeSoap {
   public client: Client;
@@ -29,15 +35,15 @@ export default class NodeSoap {
     if (!isNodeSoapLoginResponseHeaders(this.client.lastResponseHeaders)) {
       throw new Error("Failed to login");
     }
-    this.addAuthorisationHttpHeader(this.client.lastResponseHeaders["set-cookie"])
+    this.addAuthorisationHttpHeader(
+      this.client.lastResponseHeaders["set-cookie"]
+    );
   }
   addAuthorisationHttpHeader(sessnum: string[]) {
     this.client.addHttpHeader("set-cookie", sessnum);
   }
   async getServiceCategories(fltParams: {}) {
-    const response = await this.client.getServiceCategoriesAsync(
-      fltParams
-    );
+    const response = await this.client.getServiceCategoriesAsync(fltParams);
     return response;
   }
   async getVgroups(fltParams: {}) {
@@ -45,35 +51,48 @@ export default class NodeSoap {
     return response;
   }
   async getAccounts(fltParams: {}) {
-    const response = await this.client.getAccountsAsync(
-      fltParams
-      );
-      return response;
-      }
+    const response = await this.client.getAccountsAsync(fltParams);
+    return response;
+  }
   async getAccount(fltParams: {}) {
     const response = await this.client.getAccountAsync(fltParams);
     return response;
   }
   async getPayments(fltParams: {}) {
-    const response = await this.client.getPaymentsAsync(
-      fltParams
-    );
+    const response = await this.client.getPaymentsAsync(fltParams);
     return response;
   }
-  async payment(params: PaymentArguments) {
-    const { agrmid, amount, modperson = "", comment = "", transactionId } = params;
-    const receipt = transactionId || `${agrmid}-${uuidGenerator()}`;
-    const response = await this.client.PaymentAsync(
-      {
-        val: {
-          agrmid,
-          amount,
-          receipt,
-          modperson,
-          comment,
-        },
-      }
+  async printCheckOnline(amount: number): Promise<PrintCheckResponse> {
+    // Create an instance of BussinessCheck Client
+    const onlineCheck = new OpenClient();
+    // Register online check
+    const receipt = await onlineCheck.printCheck(
+      printCheckCommand(Number(amount))
     );
+    // Return online check receipt
+    return receipt;
+  }
+  async payment(params: PaymentArguments) {
+    const { agrmid, amount, modperson = "", transactionId } = params;
+
+    if (isNaN(Number(amount))) {
+      throw new Error("Wrong amount type!!!");
+    }
+
+    const { command_id = "", receipt_url = "" } = await this.printCheckOnline(
+      Number(amount)
+    );
+    const receipt = transactionId || `${agrmid}-${uuidGenerator()}`;
+    const response = await this.client.PaymentAsync({
+      val: {
+        agrmid,
+        amount,
+        receipt,
+        modperson,
+        comment: receipt_url,
+        uuid: command_id,
+      },
+    });
     return response;
   }
   async cancelPayment(payload: GetPaymentsProfile) {
@@ -81,26 +100,22 @@ export default class NodeSoap {
     const ZERO_AMOUNT = "0.0";
     const { recordid, agrmid, currid, classid, modperson, receipt } =
       payload.pay;
-    const response = await this.client.PaymentAsync(
-      {
-        val: {
-          recordid,
-          currid,
-          classid,
-          modperson,
-          agrmid,
-          receipt,
-          status: STATUS_CANCELLED,
-          amount: ZERO_AMOUNT,
-        },
-      }
-    );
+    const response = await this.client.PaymentAsync({
+      val: {
+        recordid,
+        currid,
+        classid,
+        modperson,
+        agrmid,
+        receipt,
+        status: STATUS_CANCELLED,
+        amount: ZERO_AMOUNT,
+      },
+    });
     return response;
   }
   async clientLogin(fltParams: {}) {
-    const response = await this.client.ClientLoginAsync(
-      fltParams
-    );
+    const response = await this.client.ClientLoginAsync(fltParams);
     return response;
   }
   async loginAsync(fltParams: {}) {

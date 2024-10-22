@@ -22,7 +22,7 @@ import { providers } from "../config/providers";
 import { httpQueryLogger } from "../utils/log";
 import { citypayErrorHandler } from "../utils/errorHandler";
 import CitypaySmsInformer from "./citipaySmsInformer";
-import NodeSoap from "../models/soap_v2";
+import NodeSoap from "../models/soap";
 
 class CityPay {
   public request: Request;

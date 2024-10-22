@@ -10,7 +10,7 @@ import {
   isNodeSoapAccountResponse,
 } from "../types/typeguards";
 import { sendSms } from "../utils/sms";
-import NodeSoap from "../models/soap_v2";
+import NodeSoap from "../models/soap";
 
 export default class CitypaySmsInformer implements ICitypaySmsInformer {
   public req: Request;

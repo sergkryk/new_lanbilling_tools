@@ -1,5 +1,5 @@
 import { Request } from "express";
-import NodeSoap from "../models/soap_v2";
+import NodeSoap from "../models/soap";
 
 export interface ICitypaySmsInformer {
   req: Request;
@@ -15,6 +15,7 @@ export type PaymentArguments = {
   modperson?: string;
   comment?: string;
   transactionId?: string;
+  uuid?: string;
 };
 
 export type PayFormBody = {
@@ -507,4 +508,65 @@ export type Token = {
   'set-cookie': string;
   iat: number;
   exp: number;
+}
+
+export type PrintCheckItem = {
+  name: string;
+  price: number;
+  count: number;
+  sum: number;
+  nds_not_apply: boolean;
+  item_type: number;
+  payment_mode: number;
+}
+
+export type PrintCheckCommand = {
+  goods: PrintCheckItem[];
+  author: string;
+  tag1055: string;
+  smsEmail54FZ: string;
+  payed_cash: number;
+  payed_cashless: number;
+  payed_credit: number;
+  payed_prepay: number;
+  payed_consideration: number;
+}
+
+export type PrintCheckResponse = {
+  command_id: number;
+  receipt_url: string;
+}
+
+export type StatResponse = {
+  agent_descr: string;
+  agent_id: string;
+  agent_type: string;
+  agrm_id: string;
+  agrm_num: string;
+  amount: string;
+  ani: string;
+  cat_descr: string;
+  cat_idx: string;
+  cause: string;
+  curr_id: string;
+  curr_symbol: string;
+  delegated_prefix: string;
+  dnis: string;
+  dt: string;
+  duration: string;
+  framed_prefix: string;
+  ip: string;
+  nas: string;
+  session_id: string;
+  tar_descr: string;
+  tar_id: string;
+  tar_type: string;
+  time_to: string;
+  total: string;
+  user_name: string;
+  vg_id: string;
+  vg_login: string;
+  volume: string;
+  volume_in: string;
+  volume_out: string;
 }

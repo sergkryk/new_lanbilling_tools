@@ -1,6 +1,9 @@
 import { URLSearchParams } from "url";
 
 import crypto from "crypto";
+import { PrintCheckResponse } from "../types/types";
+
+// import companies from "../config/onlineChecks";
 
 interface ICommand {
   [key: string]: any;
@@ -19,15 +22,14 @@ export default class OpenClient {
 
   constructor() {
     this.accountUrl = String(process.env.OPENCLIENT_URL);
-    this.appID = String(process.env.OPENCLIENT_APP_ID);;
-    this.secret = String(process.env.OPENCLIENT_SECRET);;
+    this.appID = String(process.env.OPENCLIENT_APP_ID);
+    this.secret = String(process.env.OPENCLIENT_SECRET);
     this.headers = new Headers({
       Accept: "application/json",
       "Content-Type": "application/json",
     });
   }
 
-  // private _log(): void {}
   /* Generates a signature for the given command by sorting its parameters alphabetically,converting it to a JSON string, and hashing it with a secret using MD5. 
   @param {ICommand} command - The command object to sign. @returns {string} Generated signature in hexadecimal format.*/
   private _getSign(command: ICommand): string {
@@ -79,7 +81,7 @@ export default class OpenClient {
     method: string,
     model: string,
     options: OpenClientRequest
-  ): Promise<void> {
+  ): Promise<PrintCheckResponse> {
     let result = new Response();
     this.headers.append("sign", this._getSign(options));
     switch (method) {
@@ -91,26 +93,27 @@ export default class OpenClient {
         break;
     }
     const data = await result.json();
-    console.log(data);
+    return data;
   }
-  private async _throwStatusCode(): Promise<void> {}
   public async getStateSystem(): Promise<void> {
     await this._sendRequest("GET", "StateSystem", {
       app_id: this.appID,
       nonce: this._getNonce(),
     });
   }
-//   public async openShift(): Promise<void> {}
-//   public async closeShift(): Promise<void> {}
-  public async printCheck(command: {}): Promise<void> {
+  public async printCheck(command: {}): Promise<PrintCheckResponse> {
     const params = {
       type: "printCheck",
       app_id: this.appID,
       nonce: this._getNonce(),
       command,
     };
-    await this._sendRequest("POST", "Command", params)
+    const res = await this._sendRequest("POST", "Command", params);
+    return res;
   }
-//   public async printPurchaseReturn(): Promise<void> {}
-//   public async dataCommandID(): Promise<void> {}
+  // private async _throwStatusCode(): Promise<void> {}
+  //   public async openShift(): Promise<void> {}
+  //   public async closeShift(): Promise<void> {}
+  //   public async printPurchaseReturn(): Promise<void> {}
+  //   public async dataCommandID(): Promise<void> {}
 }
