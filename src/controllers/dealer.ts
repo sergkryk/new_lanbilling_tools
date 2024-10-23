@@ -8,6 +8,8 @@ import {
   isToken,
 } from "../types/typeguards";
 import NodeSoap from "../models/soap";
+import { NodeSoapAccountResponse } from "../types/types";
+import { registerReceipt } from "./onlineReceipts";
 
 // Function to modify request object for Citypay query
 const getCitypayQueryObj = (req: Request, sum: string): Request => {
@@ -27,7 +29,6 @@ export const checkController = async function (
   res: Response
 ): Promise<void> {
   try {
-
     const lanbillingToken = req.body.token;
     if (!isToken(lanbillingToken)) {
       res.redirect("login");
@@ -76,15 +77,27 @@ export const payController = async function (req: Request, res: Response) {
     const { agrmid, sum, token } = req.body;
     // Initialize database model
     const soapClient = await NodeSoap.init();
-    soapClient.addAuthorisationHttpHeader([token["set-cookie"]])
+    soapClient.addAuthorisationHttpHeader([token["set-cookie"]]);
     // Modify request object to add necessary fields for SMS notification
     const updatedReq = getCitypayQueryObj(req, sum);
     // Create an instance of CitypaySmsInformer
     const informer = new CitypaySmsInformer(updatedReq, soapClient);
+    //register online receipt
+    const account: NodeSoapAccountResponse = await soapClient.getAccounts({
+      flt: {
+        agrmid,
+      },
+    });
+    const { command_id = "", receipt_url = "" } = await registerReceipt(
+      account,
+      Number(sum)
+    );
     // Send payment to the billing
     const payment = await soapClient.payment({
       agrmid,
       amount: sum,
+      uuid: command_id,
+      comment: receipt_url,
     });
     // // Check if payment response is valid
     if (!isNodeSoapPaymentResponse(payment)) {

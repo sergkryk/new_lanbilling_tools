@@ -11,6 +11,7 @@ import loginRouter from "./routes/login";
 import psbRouter from "./routes/psb";
 import paydayRouter from "./routes/payday";
 import clientRouter from "./routes/client";
+import NodeSoap from "./models/soap";
 // переменные для порта и адреса для expressjs
 const PORT = 3002;
 const INTERFACE = "127.0.0.1";
@@ -39,3 +40,5 @@ async function main() {
 }
 
 main();
+
+

@@ -2,14 +2,13 @@ import { Client, createClientAsync } from "soap";
 import path from "path";
 import {
   GetPaymentsProfile,
+  NodeSoapAccountResponse,
   PaymentArguments,
-  PrintCheckResponse,
 } from "../types/types";
 import { uuidGenerator } from "../utils/uuidGenerator";
 import { xmlCodes } from "../config/citypayResponseCodes";
 import { isNodeSoapLoginResponseHeaders } from "../types/typeguards";
-import { printCheckCommand } from "../utils/printCheckCommand";
-import OpenClient from "./openClient";
+import { registerReceipt } from "../controllers/onlineReceipts";
 
 export default class NodeSoap {
   public client: Client;
@@ -62,26 +61,18 @@ export default class NodeSoap {
     const response = await this.client.getPaymentsAsync(fltParams);
     return response;
   }
-  async printCheckOnline(amount: number): Promise<PrintCheckResponse> {
-    // Create an instance of BussinessCheck Client
-    const onlineCheck = new OpenClient();
-    // Register online check
-    const receipt = await onlineCheck.printCheck(
-      printCheckCommand(Number(amount))
-    );
-    // Return online check receipt
-    return receipt;
-  }
   async payment(params: PaymentArguments) {
-    const { agrmid, amount, modperson = "", transactionId } = params;
-
+    const {
+      agrmid,
+      amount,
+      transactionId,
+      modperson = "",
+      uuid = "",
+      comment = "",
+    } = params;
     if (isNaN(Number(amount))) {
       throw new Error("Wrong amount type!!!");
     }
-
-    const { command_id = "", receipt_url = "" } = await this.printCheckOnline(
-      Number(amount)
-    );
     const receipt = transactionId || `${agrmid}-${uuidGenerator()}`;
     const response = await this.client.PaymentAsync({
       val: {
@@ -89,8 +80,8 @@ export default class NodeSoap {
         amount,
         receipt,
         modperson,
-        comment: receipt_url,
-        uuid: command_id,
+        comment,
+        uuid,
       },
     });
     return response;

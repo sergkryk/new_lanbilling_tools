@@ -9,3 +9,4 @@
 Дата: 19.10.2024, 12:28:59 - {"account":"1110","QueryType":"pay","TransactionId":"35225","TransactionDate":"","Account":"1110","Amount":"10"}
 Дата: 19.10.2024, 12:49:07 - {"account":"1110","QueryType":"pay","TransactionId":"35228","TransactionDate":"","Account":"1110","Amount":"12"}
 Дата: 19.10.2024, 13:01:18 - {"account":"1110","QueryType":"pay","TransactionId":"35230","TransactionDate":"","Account":"1110","Amount":"12"}
+Дата: 23.10.2024, 22:18:45 - {"account":"1110","QueryType":"pay","TransactionId":"35658","TransactionDate":"","Account":"1110","Amount":"10"}

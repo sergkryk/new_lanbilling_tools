@@ -1,18 +1,14 @@
 import { Request, Response, NextFunction } from "express";
 import {
-  CitypayCheck,
-  CitypayQuery,
   NodeSoapGetPaymentsResponse,
   NodeSoapPaymentResponse,
   NodeSoapVgroupResponse,
   PaymentArguments,
-  citipayQueryTypes,
 } from "../types/types";
 import {
   isCitypayCheck,
   isCitypayQuery,
   isNodeSoapGetPaymentsResponse,
-  isNodeSoapLoginResponse,
   isNodeSoapPaymentResponse,
   isNodeSoapVgroupResponse,
 } from "../types/typeguards";

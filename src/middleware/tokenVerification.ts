@@ -1,9 +1,13 @@
 import { parseCookies } from "../utils/parseCookies";
 
 import { Request, Response, NextFunction } from "express";
-import { verifyToken } from "../utils/jwt"
+import { verifyToken } from "../utils/jwt";
 
-export const tokenVerification = function (req: Request, res: Response, next: NextFunction) {
+export const tokenVerification = function (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
   try {
     const cookies = parseCookies(req);
     if (cookies?.token) {
@@ -15,7 +19,9 @@ export const tokenVerification = function (req: Request, res: Response, next: Ne
     }
   } catch (error) {
     if (req.method === "POST") {
-      res.render("fail", {message: "Время сессии истекло. Авторизуйтесь повторно."});
+      res.render("fail", {
+        message: "Время сессии истекло. Авторизуйтесь повторно.",
+      });
     } else {
       res.redirect("login");
     }

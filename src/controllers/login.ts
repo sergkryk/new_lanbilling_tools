@@ -24,7 +24,7 @@ export const authController = async function (req: Request, res: Response) {
     }
     const billingResponseHeader = soapClient.client.lastResponseHeaders;
     const token = signToken(String(billingResponseHeader["set-cookie"]));
-    res.cookie('token', token, { expires: new Date(Date.now() + TOKEN_LIFESPAN)}); 
+    res.cookie('token', token, { httpOnly: true, expires: new Date(Date.now() + TOKEN_LIFESPAN)}); 
     res.status(200).send();
   } catch (error) {
     res.status(401).send();
