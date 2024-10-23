@@ -10,3 +10,16 @@
 Дата: 19.10.2024, 12:49:07 - {"account":"1110","QueryType":"pay","TransactionId":"35228","TransactionDate":"","Account":"1110","Amount":"12"}
 Дата: 19.10.2024, 13:01:18 - {"account":"1110","QueryType":"pay","TransactionId":"35230","TransactionDate":"","Account":"1110","Amount":"12"}
 Дата: 23.10.2024, 22:18:45 - {"account":"1110","QueryType":"pay","TransactionId":"35658","TransactionDate":"","Account":"1110","Amount":"10"}
+Дата: 23.10.2024, 22:26:35 - {"QueryType":"check","TransactionId":"1318270000","TransactionDate":"20240513223000","Account":"1110","Amount":"10.00"}
+Дата: 23.10.2024, 22:27:32 - {"QueryType":"check","TransactionId":"1318270001","TransactionDate":"20241023223000","Account":"1110","Amount":"10.00"}
+Дата: 23.10.2024, 22:27:50 - {"QueryType":"check","TransactionId":"1418270001","TransactionDate":"20241023223000","Account":"1110","Amount":"10.00"}
+Дата: 23.10.2024, 22:28:05 - {"QueryType":"pay","TransactionId":"1418270001","TransactionDate":"20241023223000","Account":"1110","Amount":"10.00"}
+Дата: 23.10.2024, 22:29:05 - {"QueryType":"cancel","TransactionId":"1418270001","TransactionDate":"20241023223000","Account":"1110","Amount":"10.00"}
+Дата: 23.10.2024, 22:29:19 - {"QueryType":"check","TransactionId":"1418270002","TransactionDate":"20241023223000","Account":"1110","Amount":"10.00"}
+Дата: 23.10.2024, 22:29:23 - {"QueryType":"pay","TransactionId":"1418270002","TransactionDate":"20241023223000","Account":"1110","Amount":"10.00"}
+Дата: 23.10.2024, 22:52:59 - {"account":"1110","QueryType":"pay","TransactionId":"35661","TransactionDate":"","Account":"1110","Amount":"10"}
+Дата: 23.10.2024, 22:53:32 - {"QueryType":"cancel","TransactionId":"1418270002","TransactionDate":"20241023223000","Account":"1110","Amount":"10.00"}
+Дата: 23.10.2024, 22:54:07 - {"QueryType":"check","TransactionId":"1418270003","TransactionDate":"20241023223000","Account":"1110","Amount":"10.00"}
+Дата: 23.10.2024, 22:54:18 - {"QueryType":"check","TransactionId":"1418270002","TransactionDate":"20241023223000","Account":"1110","Amount":"10.00"}
+Дата: 23.10.2024, 22:58:50 - {"account":"1110","QueryType":"pay","TransactionId":"35662","TransactionDate":"","Account":"1110","Amount":"10"}
+Дата: 23.10.2024, 23:11:56 - {"account":"1110","QueryType":"pay","TransactionId":"35663","TransactionDate":"","Account":"1110","Amount":"10"}

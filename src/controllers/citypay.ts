@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import {
+  NodeSoapAccountResponse,
   NodeSoapGetPaymentsResponse,
   NodeSoapPaymentResponse,
   NodeSoapVgroupResponse,
@@ -19,6 +20,7 @@ import { httpQueryLogger } from "../utils/log";
 import { citypayErrorHandler } from "../utils/errorHandler";
 import CitypaySmsInformer from "./citipaySmsInformer";
 import NodeSoap from "../models/soap";
+import { registerReceipt } from "./onlineReceipts";
 
 class CityPay {
   public request: Request;
@@ -54,7 +56,9 @@ class CityPay {
       throw new Error(xmlCodes.wrong_format);
     }
   }
-  async _cancelPayment(payment: NodeSoapGetPaymentsResponse): Promise<NodeSoapPaymentResponse>  {
+  async _cancelPayment(
+    payment: NodeSoapGetPaymentsResponse
+  ): Promise<NodeSoapPaymentResponse> {
     const cancelled = await this.dbModel.cancelPayment(payment[0].ret[0]);
     if (!isNodeSoapPaymentResponse(cancelled)) {
       throw new Error(xmlCodes.int_error);
@@ -166,12 +170,26 @@ class CityPay {
     const { Amount } = this.request.query;
     // получаю данные о учётной записи
     const vgroupRequest: NodeSoapVgroupResponse = await this._getVgroup();
+    const agrmid = String(vgroupRequest[0].ret[0].agrmid);
+    //регистрирую онлайн чек
+    const account: NodeSoapAccountResponse = await this.dbModel.getAccounts({
+      flt: {
+        agrmid,
+      },
+    });
+    const { command_id, receipt_url } = await registerReceipt(
+      account,
+      Number(Amount),
+      true
+    );
     // собираю аргументы платежа в один объект
     const paymentParams: PaymentArguments = {
-      agrmid: String(vgroupRequest[0].ret[0].agrmid),
+      agrmid,
       amount: String(Amount),
       modperson: this.modperson,
       transactionId: this.transactionId,
+      comment: receipt_url || "",
+      uuid: command_id || -1,
     };
     // отправляю запрос для проведения платежа
     const paymentReq = await this._processPayment(paymentParams);
@@ -191,9 +209,9 @@ class CityPay {
   async cancel(): Promise<void> {
     const payment = await this._getPayments();
     // проверяю платеж на соответствие типу, статусу (2 означает отмененный), совпадению провайдера проводившего и отменяющего платеж
-    this._isAbleToCancel(payment)
+    this._isAbleToCancel(payment);
     // делаю запрос на отмену платежа
-    const cancelled = await this._cancelPayment(payment)
+    const cancelled = await this._cancelPayment(payment);
     // отправляю подтверждение отмененного платежа
     this.response.send(
       convertToXml({
@@ -215,8 +233,8 @@ export const citypayController = async function (
   next: NextFunction
 ) {
   try {
-    const citypay = new CityPay(req, res, next)
-    await citypay.requestHandler()
+    const citypay = new CityPay(req, res, next);
+    await citypay.requestHandler();
   } catch (error: any) {
     citypayErrorHandler(req, res, error);
   }

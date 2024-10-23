@@ -5,10 +5,11 @@ import {
   isNodeSoapPaymentResponse,
   isNodeSoapVgroupResponse,
   isPayFormBody,
+  isPrintCheckResponse,
   isToken,
 } from "../types/typeguards";
 import NodeSoap from "../models/soap";
-import { NodeSoapAccountResponse } from "../types/types";
+import { NodeSoapAccountResponse, PaymentArguments } from "../types/types";
 import { registerReceipt } from "./onlineReceipts";
 
 // Function to modify request object for Citypay query
@@ -82,23 +83,26 @@ export const payController = async function (req: Request, res: Response) {
     const updatedReq = getCitypayQueryObj(req, sum);
     // Create an instance of CitypaySmsInformer
     const informer = new CitypaySmsInformer(updatedReq, soapClient);
-    //register online receipt
-    const account: NodeSoapAccountResponse = await soapClient.getAccounts({
-      flt: {
-        agrmid,
-      },
-    });
-    const { command_id = "", receipt_url = "" } = await registerReceipt(
-      account,
-      Number(sum)
-    );
-    // Send payment to the billing
-    const payment = await soapClient.payment({
+    // Create payload for payment
+    const paymentPayload: PaymentArguments = {
       agrmid,
       amount: sum,
-      uuid: command_id,
-      comment: receipt_url,
-    });
+    }
+    // Randomly register receipt
+    if (Math.random() < 0.2) {
+      const account: NodeSoapAccountResponse = await soapClient.getAccounts({
+        flt: {
+          agrmid,
+        },
+      });
+      const receipt = await registerReceipt(account, Number(sum));
+      if (isPrintCheckResponse(receipt)) {
+        paymentPayload.uuid = receipt.command_id;
+        paymentPayload.comment = receipt.receipt_url;
+      }
+    }
+    // Send payment to the billing
+    const payment = await soapClient.payment(paymentPayload);
     // // Check if payment response is valid
     if (!isNodeSoapPaymentResponse(payment)) {
       throw new Error();

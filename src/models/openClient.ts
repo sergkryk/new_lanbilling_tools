@@ -3,8 +3,6 @@ import { URLSearchParams } from "url";
 import crypto from "crypto";
 import { PrintCheckResponse } from "../types/types";
 
-// import companies from "../config/onlineChecks";
-
 interface ICommand {
   [key: string]: any;
 }

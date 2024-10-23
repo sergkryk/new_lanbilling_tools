@@ -15,7 +15,7 @@ export type PaymentArguments = {
   modperson?: string;
   comment?: string;
   transactionId?: string;
-  uuid?: string | number;
+  uuid?: number;
 };
 
 export type PayFormBody = {
