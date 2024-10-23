@@ -1,14 +1,9 @@
 import { Client, createClientAsync } from "soap";
 import path from "path";
-import {
-  GetPaymentsProfile,
-  NodeSoapAccountResponse,
-  PaymentArguments,
-} from "../types/types";
+import { GetPaymentsProfile, PaymentArguments } from "../types/types";
 import { uuidGenerator } from "../utils/uuidGenerator";
 import { xmlCodes } from "../config/citypayResponseCodes";
 import { isNodeSoapLoginResponseHeaders } from "../types/typeguards";
-import { registerReceipt } from "../controllers/onlineReceipts";
 
 export default class NodeSoap {
   public client: Client;
