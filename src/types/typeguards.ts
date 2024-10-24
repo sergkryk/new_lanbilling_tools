@@ -48,28 +48,36 @@ export const isPayFormBody = function (
 export const isCitypayQuery = function (
   payload: unknown
 ): payload is CitypayQuery {
-  if (typeof payload === "object" && payload !== null) {
-    return (
-      "QueryType" in payload &&
-      "TransactionId" in payload &&
-      "Account" in payload &&
-      "Amount" in payload
-    );
-  }
-  return false;
+  return (
+    typeof payload === "object" &&
+    payload !== null &&
+    "QueryType" in payload &&
+    "TransactionId" in payload &&
+    "Account" in payload &&
+    "Amount" in payload &&
+    typeof payload.QueryType === "string" &&
+    ["pay", "cancel"].includes(payload.QueryType) &&
+    typeof payload.TransactionId === "string" &&
+    typeof payload.Account === "string" &&
+    typeof payload.Amount === "string" &&
+    !Number.isNaN(Number(payload.Amount))
+  );
 };
 
 export const isCitypayCheck = function (
   payload: unknown
 ): payload is CitypayCheck {
-  if (typeof payload === "object" && payload !== null) {
-    return (
-      "QueryType" in payload &&
-      "TransactionId" in payload &&
-      "Account" in payload
-    );
-  }
-  return false;
+  return (
+    typeof payload === "object" &&
+    payload !== null &&
+    "QueryType" in payload &&
+    "TransactionId" in payload &&
+    "Account" in payload &&
+    typeof payload.QueryType === "string" &&
+    payload.QueryType === "check" &&
+    typeof payload.TransactionId === "string" &&
+    typeof payload.Account === "string"
+  );
 };
 
 export const isPaydayQuery = function (
@@ -665,43 +673,48 @@ export const isCookiesToken = function (obj: any): obj is CookiesToken {
   );
 };
 
-export const isToken = function(obj: any): obj is Token {
-  return typeof obj === 'object' &&
-         obj !== null &&
-         typeof obj['set-cookie'] === 'string' &&
-         typeof obj.iat === 'number' &&
-         typeof obj.exp === 'number';
-}
-
-export const isPrintCheckItem = function(obj: any): obj is PrintCheckItem {
+export const isToken = function (obj: any): obj is Token {
   return (
-    typeof obj.name === 'string' &&
-    typeof obj.price === 'number' &&
-    typeof obj.count === 'number' &&
-    typeof obj.sum === 'number' &&
-    typeof obj.nds_not_apply === 'boolean' &&
-    typeof obj.item_type === 'number' &&
-    typeof obj.payment_mode === 'number'
+    typeof obj === "object" &&
+    obj !== null &&
+    typeof obj["set-cookie"] === "string" &&
+    typeof obj.iat === "number" &&
+    typeof obj.exp === "number"
   );
-}
+};
 
-export const isPrintCheckCommand = function(obj: any): obj is PrintCheckCommand {
+export const isPrintCheckItem = function (obj: any): obj is PrintCheckItem {
+  return (
+    typeof obj.name === "string" &&
+    typeof obj.price === "number" &&
+    typeof obj.count === "number" &&
+    typeof obj.sum === "number" &&
+    typeof obj.nds_not_apply === "boolean" &&
+    typeof obj.item_type === "number" &&
+    typeof obj.payment_mode === "number"
+  );
+};
+
+export const isPrintCheckCommand = function (
+  obj: any
+): obj is PrintCheckCommand {
   return (
     Array.isArray(obj.goods) &&
     obj.goods.every(isPrintCheckItem) &&
-    typeof obj.author === 'string' &&
-    typeof obj.tag1055 === 'string' &&
-    typeof obj.payed_cash === 'number' &&
-    typeof obj.payed_cashless === 'number' &&
-    typeof obj.payed_credit === 'number' &&
-    typeof obj.payed_prepay === 'number' &&
-    typeof obj.payed_consideration === 'number'
+    typeof obj.author === "string" &&
+    typeof obj.tag1055 === "string" &&
+    typeof obj.payed_cash === "number" &&
+    typeof obj.payed_cashless === "number" &&
+    typeof obj.payed_credit === "number" &&
+    typeof obj.payed_prepay === "number" &&
+    typeof obj.payed_consideration === "number"
   );
-}
+};
 
-export const isPrintCheckResponse = function(obj: any): obj is PrintCheckResponse {
+export const isPrintCheckResponse = function (
+  obj: any
+): obj is PrintCheckResponse {
   return (
-    typeof obj.command_id === 'number' &&
-    typeof obj.receipt_url === 'string'
+    typeof obj.command_id === "number" && typeof obj.receipt_url === "string"
   );
-}
+};

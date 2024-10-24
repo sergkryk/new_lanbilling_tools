@@ -49,11 +49,9 @@ class CityPay {
     httpQueryLogger(this.request);
   }
   _verifyQuery(): void {
-    if (
-      !isCitypayCheck(this.request.query) ||
-      !isCitypayQuery(this.request.query)
-    ) {
-      throw new Error(xmlCodes.wrong_format);
+    const isProperQuery = isCitypayCheck(this.request.query) || isCitypayQuery(this.request.query);
+    if (!isProperQuery) {
+      throw new Error(`Failed to check query: ${this.request.query}`)
     }
   }
   async _cancelPayment(
