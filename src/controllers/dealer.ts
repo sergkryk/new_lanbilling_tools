@@ -89,18 +89,18 @@ export const payController = async function (req: Request, res: Response) {
       amount: sum,
     }
     // Randomly register receipt
-    if (Math.random() < 0.2) {
-      const account: NodeSoapAccountResponse = await soapClient.getAccounts({
-        flt: {
-          agrmid,
-        },
-      });
-      const receipt = await registerReceipt(account, Number(sum));
-      if (isPrintCheckResponse(receipt)) {
-        paymentPayload.uuid = receipt.command_id;
-        paymentPayload.comment = receipt.receipt_url;
-      }
-    }
+    // if (Math.random() < 0.2) {
+    //   const account: NodeSoapAccountResponse = await soapClient.getAccounts({
+    //     flt: {
+    //       agrmid,
+    //     },
+    //   });
+    //   const receipt = await registerReceipt(account, Number(sum));
+    //   if (isPrintCheckResponse(receipt)) {
+    //     paymentPayload.uuid = receipt.command_id;
+    //     paymentPayload.comment = receipt.receipt_url;
+    //   }
+    // }
     // Send payment to the billing
     const payment = await soapClient.payment(paymentPayload);
     // // Check if payment response is valid
